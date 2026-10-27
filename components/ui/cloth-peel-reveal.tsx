@@ -355,8 +355,18 @@ export default function ClothPeelReveal({
     const canvas = canvasRef.current
     if (!canvas || reducedMotion) return
 
+    // Without a working WebGL2 mesh, slide the CSS sheet away instead of
+    // leaving it covering the content forever.
+    const fallback = () => {
+      const id = setTimeout(() => {
+        setFallbackGone(true)
+        onRevealRef.current?.()
+      }, cfg.current.delayMs)
+      return () => clearTimeout(id)
+    }
+
     const gl = canvas.getContext("webgl2", { alpha: true, antialias: true, depth: true })
-    if (!gl) return
+    if (!gl) return fallback()
 
     const compile = (type: number, src: string) => {
       const s = gl.createShader(type)
@@ -373,11 +383,11 @@ export default function ClothPeelReveal({
     const vs = compile(gl.VERTEX_SHADER, VERTEX_SRC)
     const fs = compile(gl.FRAGMENT_SHADER, FRAGMENT_SRC)
     const prog = gl.createProgram()
-    if (!vs || !fs || !prog) return
+    if (!vs || !fs || !prog) return fallback()
     gl.attachShader(prog, vs)
     gl.attachShader(prog, fs)
     gl.linkProgram(prog)
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return fallback()
     setGlReady(true)
 
     const grid = buildGrid(120, 80)

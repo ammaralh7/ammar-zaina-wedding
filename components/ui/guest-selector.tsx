@@ -110,9 +110,10 @@ export const GuestSelector = React.forwardRef<HTMLDivElement, GuestSelectorProps
                   animate="visible"
                   exit="exit"
                   variants={imageVariants}
-                  // Apply negative margin for a slight overlap effect
-                  className="h-28 w-28 border-background object-contain shadow-md first:ms-0 [-webkit-mask-image:-webkit-radial-gradient(white,black)]"
-                  style={{ marginInlineStart: i === 0 ? 0 : -48 }}
+                  // Negative margin overlaps the figures; it tightens as the party
+                  // grows so up to 10 still fit on a phone
+                  className="h-20 w-20 sm:h-24 sm:w-24 border-background object-contain first:ms-0 [-webkit-mask-image:-webkit-radial-gradient(white,black)]"
+                  style={{ marginInlineStart: i === 0 ? 0 : count <= 3 ? -24 : count <= 6 ? -44 : -56 }}
                 />
               ))}
             </AnimatePresence>
