@@ -10,6 +10,7 @@ import { RsvpSection } from "@/components/wedding/rsvp-section";
 import { Schedule } from "@/components/wedding/schedule";
 import { SiteFooter } from "@/components/wedding/site-footer";
 import { SiteNav } from "@/components/wedding/site-nav";
+import { VerseSection } from "@/components/wedding/verse-section";
 import { getDictionary } from "@/lib/dictionaries";
 import { getAttendingGuestCount } from "@/lib/rsvp";
 import { isLocale, wedding } from "@/lib/wedding-config";
@@ -32,6 +33,7 @@ export default async function InvitationPage({ params }: PageProps<"/[lang]">) {
       <SiteNav copy={dict.nav} lang={lang} />
       <main>
         <Hero copy={dict.hero} lang={lang} />
+        {wedding.showVerse ? <VerseSection copy={dict.verse} /> : null}
         <div id="invitation">
           <ScrollWordReveal
             text={dict.invitation.text}

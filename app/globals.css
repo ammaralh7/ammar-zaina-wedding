@@ -147,6 +147,25 @@ html[lang="ar"] {
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* Border Beam (21st.dev appica-dev/border-beam): its registry CSS */
+@property --border-beam-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes border-beam {
+  to {
+    --border-beam-angle: 360deg;
+  }
+}
+
+@theme inline {
+  --animate-border-beam: border-beam var(--border-beam-duration, 5s) linear var(--border-beam-delay, 0s) infinite;
+}
+
+@custom-variant hover-none (@media (hover: none));
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

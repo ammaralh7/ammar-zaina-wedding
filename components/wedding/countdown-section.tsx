@@ -36,6 +36,12 @@ export function CountdownSection({
             shimmerColor="#ffffff"
             className="font-serif text-4xl md:text-6xl"
           />
+          {copy.verse ? (
+            <p className="mt-5 font-[family-name:var(--font-amiri)] text-2xl text-gold-soft md:text-3xl">
+              ﴿{copy.verse}﴾
+              <span className="mt-2 block text-sm text-night-foreground/50">{copy.verseReference}</span>
+            </p>
+          ) : null}
         </Reveal>
 
         <Reveal index={1} className="max-w-full">

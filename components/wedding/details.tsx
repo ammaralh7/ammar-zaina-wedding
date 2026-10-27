@@ -1,4 +1,5 @@
 import { CalendarHeart, CalendarPlus, MailCheck, MapPin } from "lucide-react";
+import { BorderBeam } from "@/components/ui/border-beam";
 import { Button } from "@/components/ui/button";
 import Reveal from "@/components/ui/reveal";
 import type { Dictionary } from "@/lib/dictionaries";
@@ -57,16 +58,18 @@ export function Details({ copy, rsvpLabel }: { copy: Dictionary["details"]; rsvp
       <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-3">
         {cards.map((card, i) => (
           <Reveal key={card.label} index={i}>
+            <BorderBeam color="#d9a52a" length={12} thickness={1.5} speed={7} delay={-i * 2.3} className="h-full rounded-3xl">
             <article className="group relative flex h-full flex-col items-center gap-3 overflow-hidden rounded-3xl border border-gold-soft/70 bg-white/60 p-8 text-center shadow-[0_20px_60px_-30px_rgba(154,107,20,0.45)] backdrop-blur transition-transform duration-500 hover:-translate-y-2">
               <span className="pointer-events-none absolute -top-16 size-40 rounded-full bg-primary/20 blur-3xl transition-opacity duration-500 group-hover:opacity-100 md:opacity-0" />
               <span className="relative grid size-14 place-items-center rounded-full bg-champagne text-gold-deep ring-1 ring-gold-soft">
                 <card.icon className="size-6" aria-hidden="true" />
               </span>
-              <p className="relative text-xs tracking-[0.3em] text-gold-deep uppercase">{card.label}</p>
+              <p className="relative text-xs tracking-[0.3em] text-gold-deep uppercase rtl:text-base">{card.label}</p>
               <p className="relative font-serif text-2xl">{card.value}</p>
               <p className="relative text-sm text-muted-foreground">{card.note}</p>
               <div className="relative mt-auto pt-4">{card.action}</div>
             </article>
+            </BorderBeam>
           </Reveal>
         ))}
       </div>

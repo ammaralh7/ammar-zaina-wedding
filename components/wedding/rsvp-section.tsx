@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { HeartHandshake, Loader2, PartyPopper, Pencil, Send } from "lucide-react";
 import { toast } from "sonner";
 import { getMyRsvp, submitRsvp, type RsvpState, type SavedRsvp } from "@/app/actions";
+import { BorderBeam } from "@/components/ui/border-beam";
 import { Button } from "@/components/ui/button";
 import { Confetti, type ConfettiRef } from "@/components/ui/confetti";
 import { FallingPattern } from "@/components/ui/falling-pattern";
@@ -12,6 +13,7 @@ import { FireworksBackground } from "@/components/ui/fireworks-show";
 import { GuestSelector } from "@/components/ui/guest-selector";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PhoneInput, PhoneInputCountrySelect, PhoneInputField } from "@/components/ui/phone-input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Reveal from "@/components/ui/reveal";
 import { Textarea } from "@/components/ui/textarea";
@@ -161,7 +163,13 @@ export function RsvpSection({
       </Reveal>
 
       <Reveal index={1} className="mx-auto max-w-xl">
-        <div className="rounded-[2rem] border border-gold-soft bg-background/85 p-6 shadow-[0_30px_80px_-40px_rgba(154,107,20,0.6)] backdrop-blur-md md:p-10">
+        <BorderBeam
+          color="#d9a52a"
+          length={16}
+          thickness={2}
+          speed={8}
+          className="rounded-[2rem] border border-gold-soft bg-background/85 p-6 shadow-[0_30px_80px_-40px_rgba(154,107,20,0.6)] backdrop-blur-md md:p-10"
+        >
           <AnimatePresence mode="wait" initial={false}>
             {showConfirmation ? (
               <motion.div
@@ -310,18 +318,22 @@ export function RsvpSection({
 
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="rsvp-phone">{copy.phoneLabel}</Label>
-                  <Input
+                  {/* Any country: the field submits E.164, e.g. +201001234567 */}
+                  <PhoneInput
                     id="rsvp-phone"
                     name="phone"
-                    type="tel"
-                    maxLength={40}
-                    autoComplete="tel"
                     dir="ltr"
-                    placeholder={copy.phonePlaceholder}
+                    locale={lang}
+                    defaultCountry={wedding.defaultPhoneCountry}
+                    searchPlaceholder={copy.phoneSearch}
+                    emptyText={copy.phoneEmpty}
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="h-11 rounded-xl bg-white/70 text-base rtl:text-right"
-                  />
+                    onValueChange={setPhone}
+                    className="h-11 rounded-xl bg-white/70"
+                  >
+                    <PhoneInputCountrySelect />
+                    <PhoneInputField placeholder={copy.phonePlaceholder} className="text-base" />
+                  </PhoneInput>
                 </div>
 
                 <div className="flex flex-col gap-2">
@@ -354,7 +366,7 @@ export function RsvpSection({
               </motion.form>
             )}
           </AnimatePresence>
-        </div>
+        </BorderBeam>
       </Reveal>
     </section>
   );

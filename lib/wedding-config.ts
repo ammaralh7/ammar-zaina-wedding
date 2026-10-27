@@ -7,6 +7,10 @@ export const wedding = {
   mapsUrl: "https://www.google.com/maps/search/?api=1&query=Cairo%2C+Egypt",
   // Show "N guests are coming" on the public page (number only, never names)
   showPublicHeadcount: true,
+  // Opening Qur'an verse (Ar-Rum 30:21) shown under a gold lamp
+  showVerse: true,
+  // Country preselected in the phone field (any country can be chosen)
+  defaultPhoneCountry: "EG",
   maxPartySize: 10,
 } as const;
 

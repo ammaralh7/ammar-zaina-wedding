@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 import { MotionConfig, motion } from "motion/react";
 import { ChevronDown } from "lucide-react";
+import { BorderBeam } from "@/components/ui/border-beam";
 import ClothPeelReveal from "@/components/ui/cloth-peel-reveal";
 import { SparklesCore } from "@/components/ui/sparkles";
 import { TextReveal } from "@/components/ui/text-reveal";
 import { TextShimmer } from "@/components/ui/text-shimmer";
 import type { Dictionary } from "@/lib/dictionaries";
-import type { Locale } from "@/lib/wedding-config";
+import { wedding, type Locale } from "@/lib/wedding-config";
 
 const SHEET_COLOR = "#f4e7c8";
 const GOLD = "#9a6b14";
@@ -68,15 +69,29 @@ export function Hero({ copy, lang }: { copy: Dictionary["hero"]; lang: Locale })
             particleDensity={110}
             speed={1.4}
           />
-          <div className="pointer-events-none absolute inset-6 -z-10 rounded-[2rem] border border-gold-soft/70 md:inset-10" />
+          <BorderBeam
+            color="#d9a52a"
+            length={14}
+            thickness={2}
+            speed={10}
+            className="pointer-events-none absolute inset-6 -z-10 rounded-[2rem] border border-gold-soft/70 md:inset-10"
+          />
           <div className="pointer-events-none absolute inset-8 -z-10 rounded-[1.75rem] border border-gold-soft/40 md:inset-12" />
 
           <div className="flex max-w-3xl flex-col items-center px-6 text-center">
+            {copy.bismillah ? (
+              <motion.p
+                {...enter(0)}
+                className="mb-6 font-[family-name:var(--font-aref-ruqaa)] text-2xl text-gold-deep md:text-3xl"
+              >
+                {copy.bismillah}
+              </motion.p>
+            ) : null}
             <TextReveal
               text={copy.kicker}
               play={revealed}
               startOnView={false}
-              className="text-xs uppercase tracking-[0.4em] text-gold-deep md:text-sm"
+              className="text-xs uppercase tracking-[0.4em] text-gold-deep md:text-sm rtl:text-lg rtl:md:text-xl"
             />
 
             <motion.h1 {...enter(0.25)} className="mt-6">
@@ -115,13 +130,19 @@ export function Hero({ copy, lang }: { copy: Dictionary["hero"]; lang: Locale })
               />
             </motion.div>
 
-            <motion.p {...enter(1.25)} className="mt-3 text-sm tracking-[0.3em] text-muted-foreground uppercase">
+            {copy.hijri ? (
+              <motion.p {...enter(1.15)} className="mt-2 text-sm text-gold-deep rtl:text-base">
+                {copy.hijri}
+              </motion.p>
+            ) : null}
+
+            <motion.p {...enter(1.25)} className="mt-3 text-sm tracking-[0.3em] text-muted-foreground uppercase rtl:text-base">
               {copy.city}
             </motion.p>
           </div>
 
           <motion.a
-            href="#invitation"
+            href={wedding.showVerse ? "#verse" : "#invitation"}
             {...enter(1.6)}
             className="absolute bottom-8 flex flex-col [@media(max-height:640px)]:hidden items-center gap-1 text-xs tracking-[0.3em] text-gold-deep uppercase"
           >

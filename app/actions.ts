@@ -1,11 +1,12 @@
 "use server";
 
 import { refresh } from "next/cache";
+import { isPossiblePhoneNumber } from "libphonenumber-js/min";
 import { z } from "zod";
 import { getSupabase } from "@/lib/supabase-server";
 import { wedding } from "@/lib/wedding-config";
 
-export type RsvpErrorKey = "name" | "attending" | "party" | "notConfigured" | "generic";
+export type RsvpErrorKey = "name" | "attending" | "party" | "phone" | "notConfigured" | "generic";
 
 export type SavedRsvp = {
   id: string;
@@ -27,7 +28,14 @@ const rsvpSchema = z
     name: z.string().trim().min(2, "name").max(100, "name"),
     attending: z.enum(["yes", "no"], { error: "attending" }),
     partySize: z.coerce.number().int().min(0).max(wedding.maxPartySize),
-    phone: z.string().trim().max(40).optional().default(""),
+    // Any country: the form sends E.164 (+<country code><number>)
+    phone: z
+      .string()
+      .trim()
+      .max(40)
+      .optional()
+      .default("")
+      .refine((v) => v === "" || isPossiblePhoneNumber(v), "phone"),
     message: z.string().trim().max(500).optional().default(""),
     locale: z.enum(["en", "ar"]).catch("en"),
     id: z.uuid().optional().or(z.literal("")),
@@ -58,7 +66,9 @@ export async function submitRsvp(_prev: RsvpState, formData: FormData): Promise<
   if (!parsed.success) {
     const message = parsed.error.issues[0]?.message;
     const error: RsvpErrorKey =
-      message === "name" || message === "attending" || message === "party" ? message : "generic";
+      message === "name" || message === "attending" || message === "party" || message === "phone"
+        ? message
+        : "generic";
     return { status: "error", error };
   }
 
