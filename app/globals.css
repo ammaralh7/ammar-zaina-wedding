@@ -1,26 +1,177 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Theme: "Honey Glow Gold" by serafimcloud, pulled from the 21st.dev theme library
+ * (https://21st.dev/community/themes/honey-glow-gold). Wedding extras (gold-deep,
+ * champagne, night, font roles) are layered on top.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fffcf0;
+  --foreground: #19191a;
+  --card: #fffcf0;
+  --card-foreground: #19191a;
+  --popover: #fffcf0;
+  --popover-foreground: #19191a;
+  --primary: #ffc23d;
+  --primary-foreground: #161616;
+  --secondary: #f9efe2;
+  --secondary-foreground: #19191a;
+  --muted: #f7f4e9;
+  --muted-foreground: #737373;
+  --accent: #f5f5f5;
+  --accent-foreground: #19191a;
+  --destructive: #cf001c;
+  --destructive-foreground: #ffffff;
+  --border: #e5e5e5;
+  --input: #e5e5e5;
+  --ring: #ffc23d;
+  --chart-1: #92c5ff;
+  --chart-2: #3a81f6;
+  --chart-3: #2563ef;
+  --chart-4: #1a4eda;
+  --chart-5: #1f3fad;
+  --sidebar: #fffcf0;
+  --sidebar-foreground: #19191a;
+  --sidebar-primary: #ffc23d;
+  --sidebar-primary-foreground: #161616;
+  --sidebar-accent: #f5f5f5;
+  --sidebar-accent-foreground: #19191a;
+  --sidebar-border: #e5e5e5;
+  --sidebar-ring: #ffc23d;
+  --radius: 0.5rem;
+  --letter-spacing: -0.01em;
+
+  /* Wedding extras */
+  --gold-deep: #9a6b14;
+  --gold-soft: #f1d79a;
+  --champagne: #f4e7c8;
+  --night: #0d0a06;
+  --night-foreground: #f8eed6;
+
+  /* Font roles; swapped for Arabic below */
+  --app-sans: var(--font-albert), ui-sans-serif, system-ui, sans-serif;
+  --app-serif: var(--font-dm-serif), Georgia, serif;
+  --app-script: var(--font-great-vibes), cursive;
+}
+
+html[lang="ar"] {
+  --app-sans: var(--font-amiri), var(--font-albert), serif;
+  --app-serif: var(--font-amiri), serif;
+  --app-script: var(--font-aref-ruqaa), var(--font-amiri), serif;
+}
+
+.dark {
+  --background: #18181b;
+  --foreground: #fafafa;
+  --card: #18181b;
+  --card-foreground: #fafafa;
+  --popover: #18181b;
+  --popover-foreground: #fafafa;
+  --primary: #ffc23d;
+  --primary-foreground: #000000;
+  --secondary: #18181b;
+  --secondary-foreground: #fafafa;
+  --muted: #222225;
+  --muted-foreground: #a1a1a1;
+  --accent: #404040;
+  --accent-foreground: #fafafa;
+  --destructive: #ff6568;
+  --destructive-foreground: #fafafa;
+  --border: #282828;
+  --input: #343434;
+  --ring: #ffc23d;
+  --sidebar: #18181b;
+  --sidebar-foreground: #fafafa;
+  --sidebar-primary: #ffc23d;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #404040;
+  --sidebar-accent-foreground: #fafafa;
+  --sidebar-border: #282828;
+  --sidebar-ring: #ffc23d;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-gold-deep: var(--gold-deep);
+  --color-gold-soft: var(--gold-soft);
+  --color-champagne: var(--champagne);
+  --color-night: var(--night);
+  --color-night-foreground: var(--night-foreground);
+
+  --font-sans: var(--app-sans);
+  --font-serif: var(--app-serif);
+  --font-script: var(--app-script);
+  --font-heading: var(--app-serif);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+    letter-spacing: var(--letter-spacing);
+  }
+  /* Letter-spacing breaks the joins between Arabic letters */
+  html[lang="ar"] body,
+  html[lang="ar"] body * {
+    letter-spacing: normal !important;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

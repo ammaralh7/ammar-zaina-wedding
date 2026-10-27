@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ammar & Zaina · Wedding RSVP
 
-## Getting Started
+Invitation and RSVP site for **Tuesday, July 27, 2027 · Cairo, Egypt**, in English (`/en`) and Arabic (`/ar`).
 
-First, run the development server:
+- Guests reply coming / not coming, with party size, phone and a note. Replies are saved to Supabase, and each guest sees a confirmation they can edit later from the same device.
+- `/en/admin` (password protected) shows the live headcount, every reply, a search box, a status filter, delete, and CSV export.
+- The UI is built from real [21st.dev](https://21st.dev) registry components in `components/ui` (cloth-peel reveal, sparkles, text shimmer and reveal, animated countdown, fireworks, falling pattern, scroll word reveal, scroll timeline, guest selector, confetti, count-up, datatable). The theme is 21st's "Honey Glow Gold".
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Edit the details
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- `lib/wedding-config.ts`: date and time, map link, max party size, and whether the public headcount is shown.
+- `lib/dictionaries.ts`: all wording in English and Arabic, including the venue and the evening schedule.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Supabase** ([supabase.com](https://supabase.com), sign in with GitHub): create a project (Frankfurt is the closest region to Cairo). Open **SQL Editor**, paste in `supabase/schema.sql`, and run it.
+2. Copy `.env.example` to `.env.local` and fill in:
+   - `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (Project Settings → API keys; use the secret **service_role** key)
+   - `ADMIN_PASSWORD`: any password you choose for the admin page
+3. Run it locally:
 
-## Learn More
+   ```bash
+   npm install
+   npm run dev
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+   Then open http://localhost:3000.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deploy (Vercel)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+On [vercel.com](https://vercel.com), sign in with GitHub, then **Add New → Project → Import** this repo. Add the same three environment variables and deploy. Send guests the `https://<project>.vercel.app` link; `/ar` opens the Arabic version directly.

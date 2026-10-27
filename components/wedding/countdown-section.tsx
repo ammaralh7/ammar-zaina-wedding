@@ -1,0 +1,61 @@
+"use client";
+
+import type { ReactNode } from "react";
+import { AnimatedCountdown } from "@/components/ui/animated-countdown";
+import { FireworksBackground } from "@/components/ui/fireworks-show";
+import Reveal from "@/components/ui/reveal";
+import { TextShimmer } from "@/components/ui/text-shimmer";
+import type { Dictionary } from "@/lib/dictionaries";
+import { wedding } from "@/lib/wedding-config";
+
+export const GOLD_FIREWORKS = ["#ffc23d", "#ffe7a3", "#f1d79a", "#ffffff", "#e8b04b", "#fff3d1"];
+
+export function CountdownSection({
+  copy,
+  children,
+}: {
+  copy: Dictionary["countdown"];
+  children?: ReactNode;
+}) {
+  return (
+    <FireworksBackground
+      colors={GOLD_FIREWORKS}
+      className="bg-[radial-gradient(ellipse_at_top,#2b2010_0%,var(--night)_65%)] text-night-foreground"
+    >
+      <section
+        id="countdown"
+        className="flex min-h-svh flex-col items-center justify-center gap-10 px-4 py-24 text-center"
+      >
+        <Reveal>
+          <TextShimmer
+            text={copy.title}
+            as="h2"
+            duration={3}
+            delay={1}
+            baseColor="#f1d79a"
+            shimmerColor="#ffffff"
+            className="font-serif text-4xl md:text-6xl"
+          />
+        </Reveal>
+
+        <Reveal index={1} className="max-w-full">
+          <AnimatedCountdown
+            targetDate={wedding.startsAt}
+            variant="modern"
+            size="lg"
+            labels={copy.labels}
+            completionMessage={copy.done}
+            ariaLabel={copy.title}
+            containerClassName="border-gold-soft/20 bg-white/[0.04] shadow-[0_0_80px_-20px_rgba(255,194,61,0.35)] backdrop-blur-md"
+            unitClassName="border-gold-soft/25 bg-white/[0.05] hover:border-primary/60 hover:bg-white/[0.08]"
+            numberClassName="font-serif font-normal text-primary drop-shadow-[0_0_18px_rgba(255,194,61,0.45)]"
+            labelClassName="text-night-foreground/60"
+            accentClassName="via-primary"
+          />
+        </Reveal>
+
+        {children}
+      </section>
+    </FireworksBackground>
+  );
+}
