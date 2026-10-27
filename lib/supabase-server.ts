@@ -7,8 +7,9 @@ let client: SupabaseClient | null | undefined;
 // server-only client is the only way in.
 export function getSupabase(): SupabaseClient | null {
   if (client !== undefined) return client;
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  // Names cover both a manual setup and Vercel's Supabase integration
+  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY;
   client =
     url && key
       ? createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } })

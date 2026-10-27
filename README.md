@@ -26,6 +26,11 @@ Invitation and RSVP site for **Tuesday, July 27, 2027 · Cairo, Egypt**, in Engl
 
    Then open http://localhost:3000.
 
-## Deploy (Vercel)
+## Deploy (Vercel + Supabase)
 
-On [vercel.com](https://vercel.com), sign in with GitHub, then **Add New → Project → Import** this repo. Add the same three environment variables and deploy. Send guests the `https://<project>.vercel.app` link; `/ar` opens the Arabic version directly.
+1. On [vercel.com](https://vercel.com), sign in with GitHub, then **Add New → Project → Import** this repo and deploy.
+2. In the Vercel project, open **Storage → Create Database → Supabase** and connect it to the project. This adds the Supabase environment variables for you.
+3. In **Settings → Environment Variables**, add `ADMIN_PASSWORD`.
+4. **Deployments → Redeploy.** Every build runs `scripts/migrate.mjs`, which creates the `rsvps` table from `supabase/schema.sql` when a database URL is present, so there is no SQL to paste.
+
+Send guests the `https://<project>.vercel.app` link; `/ar` opens the Arabic version directly. The site also accepts the manual Supabase variables from `.env.example`.
