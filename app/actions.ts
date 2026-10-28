@@ -1,8 +1,10 @@
 "use server";
 
 import { refresh } from "next/cache";
+import { after } from "next/server";
 import { isPossiblePhoneNumber } from "libphonenumber-js/min";
 import { z } from "zod";
+import { emailRsvpNotice } from "@/lib/notify";
 import { getSupabase } from "@/lib/supabase-server";
 import { wedding } from "@/lib/wedding-config";
 
@@ -111,6 +113,10 @@ export async function submitRsvp(_prev: RsvpState, formData: FormData): Promise<
   }
 
   refresh();
+
+  // Sent once the guest already has their confirmation, so email never slows the form down
+  const updated = Boolean(v.id && v.token && result.id === v.id);
+  after(() => emailRsvpNotice({ ...row, updated }));
 
   return {
     status: "saved",

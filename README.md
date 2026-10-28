@@ -33,4 +33,8 @@ Invitation and RSVP site for **Tuesday, July 27, 2027 · Cairo, Egypt**, in Engl
 3. In **Settings → Environment Variables**, add `ADMIN_PASSWORD`.
 4. **Deployments → Redeploy.** Every build runs `scripts/migrate.mjs`, which creates the `rsvps` table from `supabase/schema.sql` when a database URL is present, so there is no SQL to paste.
 
+To get an email for every new or changed RSVP, create a free [Resend](https://resend.com) account with the address that should receive them, make an API key, and add `RESEND_API_KEY` and `RSVP_NOTIFY_EMAIL` (that same address) in **Settings → Environment Variables**, then redeploy. Without a domain of your own, Resend only delivers to the address the account was created with.
+
+A daily Vercel cron (`vercel.json`) calls `/api/keepalive`, which runs one count query so a free Supabase project is never paused for inactivity. To make that endpoint answer only Vercel, add a `CRON_SECRET` environment variable with any random value.
+
 Send guests the `https://<project>.vercel.app` link: it opens the Arabic version (set `defaultLocale` in `lib/wedding-config.ts` to change that), and `/en` opens the English version directly. The site also accepts the manual Supabase variables from `.env.example`.
