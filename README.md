@@ -33,4 +33,4 @@ Invitation and RSVP site for **Tuesday, July 27, 2027 · Cairo, Egypt**, in Engl
 3. In **Settings → Environment Variables**, add `ADMIN_PASSWORD`.
 4. **Deployments → Redeploy.** Every build runs `scripts/migrate.mjs`, which creates the `rsvps` table from `supabase/schema.sql` when a database URL is present, so there is no SQL to paste.
 
-Send guests the `https://<project>.vercel.app` link; `/ar` opens the Arabic version directly. The site also accepts the manual Supabase variables from `.env.example`.
+Send guests the `https://<project>.vercel.app` link: it opens the Arabic version (set `defaultLocale` in `lib/wedding-config.ts` to change that), and `/en` opens the English version directly. The site also accepts the manual Supabase variables from `.env.example`.
