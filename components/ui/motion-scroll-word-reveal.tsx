@@ -78,7 +78,7 @@ export function ScrollWordReveal({
   const words = text.split(" ")
 
   return (
-    <section ref={targetRef} className={cn("relative h-[220svh]", className)}>
+    <section ref={targetRef} className={cn("relative h-[170svh]", className)}>
       <div className="sticky top-0 flex h-svh items-center">
         <div className="mx-auto flex w-full max-w-4xl items-stretch gap-6 px-6 md:gap-10">
           <div className="relative w-[2px] shrink-0 overflow-hidden rounded-full bg-gold-soft/40" aria-hidden="true">

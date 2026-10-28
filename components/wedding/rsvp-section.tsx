@@ -138,7 +138,7 @@ export function RsvpSection({
     : "";
 
   return (
-    <section id="rsvp" className="relative isolate overflow-hidden px-4 py-28">
+    <section id="rsvp" className="relative isolate overflow-hidden px-4 py-20 md:py-28">
       <FallingPattern
         className="absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_at_center,transparent_25%,#000_80%)]"
         color="var(--primary)"
@@ -168,7 +168,7 @@ export function RsvpSection({
           length={16}
           thickness={2}
           speed={8}
-          className="rounded-[2rem] border border-gold-soft bg-background/85 p-6 shadow-[0_30px_80px_-40px_rgba(154,107,20,0.6)] backdrop-blur-md md:p-10"
+          className="rounded-[2rem] border border-gold-soft bg-background/95 p-6 shadow-[0_30px_80px_-40px_rgba(154,107,20,0.6)] md:p-10"
         >
           <AnimatePresence mode="wait" initial={false}>
             {showConfirmation ? (

@@ -49,7 +49,7 @@ export function Details({ copy, rsvpLabel }: { copy: Dictionary["details"]; rsvp
   ];
 
   return (
-    <section id="details" className="relative px-4 py-28">
+    <section id="details" className="relative px-4 py-20 md:py-28">
       <Reveal className="mb-14 text-center">
         <h2 className="font-serif text-4xl md:text-5xl">{copy.title}</h2>
         <div className="mx-auto mt-5 h-px w-24 bg-gradient-to-r from-transparent via-gold-deep to-transparent" />
@@ -59,7 +59,7 @@ export function Details({ copy, rsvpLabel }: { copy: Dictionary["details"]; rsvp
         {cards.map((card, i) => (
           <Reveal key={card.label} index={i}>
             <BorderBeam color="#d9a52a" length={12} thickness={1.5} speed={7} delay={-i * 2.3} className="h-full rounded-3xl">
-            <article className="group relative flex h-full flex-col items-center gap-3 overflow-hidden rounded-3xl border border-gold-soft/70 bg-white/60 p-8 text-center shadow-[0_20px_60px_-30px_rgba(154,107,20,0.45)] backdrop-blur transition-transform duration-500 hover:-translate-y-2">
+            <article className="group relative flex h-full flex-col items-center gap-3 overflow-hidden rounded-3xl border border-gold-soft/70 bg-white/80 p-8 text-center shadow-[0_20px_60px_-30px_rgba(154,107,20,0.45)] transition-transform duration-500 hover:-translate-y-2">
               <span className="pointer-events-none absolute -top-16 size-40 rounded-full bg-primary/20 blur-3xl transition-opacity duration-500 group-hover:opacity-100 md:opacity-0" />
               <span className="relative grid size-14 place-items-center rounded-full bg-champagne text-gold-deep ring-1 ring-gold-soft">
                 <card.icon className="size-6" aria-hidden="true" />

@@ -5,8 +5,8 @@ import { LampContainer } from "@/components/ui/lamp";
 import type { Dictionary } from "@/lib/dictionaries";
 
 const rise = (delay: number) => ({
-  initial: { opacity: 0, y: 40, filter: "blur(8px)" },
-  whileInView: { opacity: 1, y: 0, filter: "blur(0px)" },
+  initial: { opacity: 0, y: 40 },
+  whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, amount: 0.4 },
   transition: { delay, duration: 1, ease: [0.22, 1, 0.36, 1] as const },
 });
@@ -14,7 +14,7 @@ const rise = (delay: number) => ({
 export function VerseSection({ copy }: { copy: Dictionary["verse"] }) {
   return (
     <section id="verse" aria-label={copy.reference}>
-      <LampContainer className="min-h-[82svh] rounded-none">
+      <LampContainer className="rounded-none">
         <div className="flex max-w-3xl flex-col items-center gap-6 text-center">
           {copy.bismillah ? (
             <motion.p
@@ -38,7 +38,8 @@ export function VerseSection({ copy }: { copy: Dictionary["verse"] }) {
             {...rise(0.55)}
             lang="ar"
             dir="rtl"
-            className="bg-gradient-to-b from-[#fff3d1] via-[#f1d79a] to-[#c9971c] bg-clip-text font-[family-name:var(--font-amiri)] text-3xl leading-[1.9] text-transparent md:text-5xl md:leading-[1.8]"
+            // A solid fill: a vertical gradient left the vowel marks paler than their letters
+            className="font-[family-name:var(--font-quran)] text-3xl leading-[1.9] text-gold-soft md:text-5xl md:leading-[1.8]"
           >
             ﴿{copy.text}﴾
           </motion.blockquote>

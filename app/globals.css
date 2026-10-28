@@ -160,8 +160,16 @@ html[lang="ar"] {
   }
 }
 
+/* Falling Pattern: each layer slides down one tile and repeats */
+@keyframes falling-pattern {
+  to {
+    transform: translate3d(0, var(--fall-distance), 0);
+  }
+}
+
 @theme inline {
   --animate-border-beam: border-beam var(--border-beam-duration, 5s) linear var(--border-beam-delay, 0s) infinite;
+  --animate-falling-pattern: falling-pattern 4s linear infinite;
 }
 
 @custom-variant hover-none (@media (hover: none));

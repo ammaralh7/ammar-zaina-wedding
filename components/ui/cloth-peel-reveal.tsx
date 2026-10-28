@@ -33,8 +33,12 @@ export interface ClothPeelRevealProps {
   tilt?: number
   /** Root height. A definite length - never a percentage. */
   height?: string
-  /** Fired once, when the sheet is fully gone */
+  /** Fired once, when the peel reaches `revealAt` */
   onReveal?: () => void
+  /** Peel progress (0..1) at which `onReveal` fires. 1 waits for the sheet to be fully gone. */
+  revealAt?: number
+  /** Keep the sheet in place and the mesh idle while true, e.g. until its font loads */
+  hold?: boolean
   /** Extra root class names */
   className?: string
 }
@@ -216,7 +220,7 @@ float noise(vec2 p) {
 
 float fbm(vec2 p) {
   float s = 0.0, a = 0.5, n = 0.0;
-  for (int i = 0; i < 4; i++) { s += a * noise(p); n += a; p *= 2.07; a *= 0.5; }
+  for (int i = 0; i < 3; i++) { s += a * noise(p); n += a; p *= 2.07; a *= 0.5; }
   return s / n;
 }
 
@@ -322,6 +326,8 @@ export default function ClothPeelReveal({
   edgeRoughness = 0.09,
   height = "100svh",
   onReveal,
+  revealAt = 1,
+  hold = false,
   className = "",
 }: ClothPeelRevealProps) {
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null)
@@ -336,11 +342,11 @@ export default function ClothPeelReveal({
   // Read by the render loop, so changing a knob never rebuilds the GL program.
   const cfg = React.useRef({
     sheetColor, sheetText, textColor, fontFamily, durationMs, delayMs, loop, holdMs,
-    angleDeg, foldAmplitude, foldFrequency, edgeRoughness, tilt,
+    angleDeg, foldAmplitude, foldFrequency, edgeRoughness, tilt, revealAt,
   })
   cfg.current = {
     sheetColor, sheetText, textColor, fontFamily, durationMs, delayMs, loop, holdMs,
-    angleDeg, foldAmplitude, foldFrequency, edgeRoughness, tilt,
+    angleDeg, foldAmplitude, foldFrequency, edgeRoughness, tilt, revealAt,
   }
 
   React.useEffect(() => {
@@ -353,7 +359,7 @@ export default function ClothPeelReveal({
 
   React.useEffect(() => {
     const canvas = canvasRef.current
-    if (!canvas || reducedMotion) return
+    if (!canvas || reducedMotion || hold) return
 
     // Without a working WebGL2 mesh, slide the CSS sheet away instead of
     // leaving it covering the content forever.
@@ -365,7 +371,7 @@ export default function ClothPeelReveal({
       return () => clearTimeout(id)
     }
 
-    const gl = canvas.getContext("webgl2", { alpha: true, antialias: true, depth: true })
+    const gl = canvas.getContext("webgl2", { alpha: true, antialias: false, depth: true })
     if (!gl) return fallback()
 
     const compile = (type: number, src: string) => {
@@ -390,7 +396,7 @@ export default function ClothPeelReveal({
     if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return fallback()
     setGlReady(true)
 
-    const grid = buildGrid(120, 80)
+    const grid = buildGrid(72, 48)
     const uvBuf = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, uvBuf)
     gl.bufferData(gl.ARRAY_BUFFER, grid.uvs, gl.STATIC_DRAW)
@@ -429,7 +435,7 @@ export default function ClothPeelReveal({
     gl.enable(gl.DEPTH_TEST)
     gl.depthFunc(gl.LEQUAL)
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 2)
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5)
     const resize = () => {
       const w = Math.max(1, Math.round(canvas.clientWidth * dpr))
       const h = Math.max(1, Math.round(canvas.clientHeight * dpr))
@@ -458,7 +464,7 @@ export default function ClothPeelReveal({
       else if (c.loop) progress = loopPhase(elapsed, c.durationMs, c.holdMs).progress
       else progress = peelEase(elapsed / Math.max(c.durationMs, 1))
 
-      if (!fired && progress >= 1) {
+      if (!fired && progress >= c.revealAt) {
         fired = true
         onRevealRef.current?.()
       }
@@ -509,7 +515,7 @@ export default function ClothPeelReveal({
       gl.deleteBuffer(idxBuf)
       if (tex) gl.deleteTexture(tex)
     }
-  }, [reducedMotion])
+  }, [reducedMotion, hold])
 
   // Reduced motion: no cloth, just uncover once.
   React.useEffect(() => {

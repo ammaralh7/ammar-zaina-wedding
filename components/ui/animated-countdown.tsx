@@ -38,6 +38,8 @@ export type AnimatedCountdownProps = {
   ariaLabel?: string;
   /** Override unit labels, e.g. for translations */
   labels?: Partial<Record<CountdownUnitKey, string>>;
+  /** Locale for the digits, e.g. "ar-EG" for Arabic-Indic numerals */
+  locale?: string;
 };
 
 const DEFAULT_STATIC_TIME: TimeLeft = {
@@ -118,8 +120,11 @@ function isFinished(time: TimeLeft) {
   return time.days === 0 && time.hours === 0 && time.minutes === 0 && time.seconds === 0;
 }
 
-function format(value: number) {
-  return String(Math.max(0, value)).padStart(2, "0");
+function format(value: number, locale?: string) {
+  const n = Math.max(0, value);
+  return locale
+    ? new Intl.NumberFormat(locale, { minimumIntegerDigits: 2, useGrouping: false }).format(n)
+    : String(n).padStart(2, "0");
 }
 
 function useVisibleUnits({
@@ -178,9 +183,11 @@ function CountdownUnit({
   accentClassName,
   index,
   label,
+  locale,
 }: {
   unit: CountdownUnitKey;
   label?: string;
+  locale?: string;
   value: number;
   variant: CountdownVariant;
   size: CountdownSize;
@@ -216,7 +223,7 @@ function CountdownUnit({
         />
       )}
       <CountdownNumber
-        value={format(value)}
+        value={format(value, locale)}
         className={cn(
           "font-bold leading-none tracking-tight text-foreground",
           variant === "digital" && "font-mono text-cyan-100 drop-shadow-[0_0_18px_rgba(34,211,238,0.45)]",
@@ -265,6 +272,7 @@ export function AnimatedCountdown({
   size = compact ? "sm" : "md",
   ariaLabel = "Countdown timer",
   labels,
+  locale,
 }: AnimatedCountdownProps) {
   // Hydration-safe: matches the server on first render
   const reduceMotion = usePrefersReducedMotion();
@@ -339,6 +347,7 @@ export function AnimatedCountdown({
               accentClassName={accentClassName}
               index={index}
               label={labels?.[unit]}
+              locale={locale}
             />
             {showSeparators && index < visibleUnits.length - 1 && (
               <span

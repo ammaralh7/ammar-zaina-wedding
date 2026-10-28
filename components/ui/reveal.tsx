@@ -4,11 +4,12 @@ import { motion, Variants } from "motion/react";
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
+// Opacity and position only: animating a blur filter over whole sections made
+// scrolling stutter on phones
 const VARIANTS: Variants = {
-  hidden: { opacity: 0, y: 40, filter: "blur(10px)" },
+  hidden: { opacity: 0, y: 40 },
   show: (i: number = 0) => ({
     opacity: 1,
-    filter: "blur(0px)",
     y: 0,
     transition: { delay: i * 0.15, duration: 0.6, ease: "easeOut" },
   }),

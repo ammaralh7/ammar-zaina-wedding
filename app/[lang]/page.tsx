@@ -9,7 +9,6 @@ import { Hero } from "@/components/wedding/hero";
 import { RsvpSection } from "@/components/wedding/rsvp-section";
 import { Schedule } from "@/components/wedding/schedule";
 import { SiteFooter } from "@/components/wedding/site-footer";
-import { SiteNav } from "@/components/wedding/site-nav";
 import { VerseSection } from "@/components/wedding/verse-section";
 import { getDictionary } from "@/lib/dictionaries";
 import { getAttendingGuestCount } from "@/lib/rsvp";
@@ -30,7 +29,6 @@ export default async function InvitationPage({ params }: PageProps<"/[lang]">) {
 
   return (
     <>
-      <SiteNav copy={dict.nav} lang={lang} />
       <main>
         <Hero copy={dict.hero} lang={lang} />
         {wedding.showVerse ? <VerseSection copy={dict.verse} /> : null}
@@ -41,7 +39,7 @@ export default async function InvitationPage({ params }: PageProps<"/[lang]">) {
             headingClassName="font-serif text-foreground"
           />
         </div>
-        <CountdownSection copy={dict.countdown}>
+        <CountdownSection copy={dict.countdown} lang={lang}>
           {wedding.showPublicHeadcount ? (
             <Suspense fallback={null}>
               <PublicHeadcount label={dict.countdown.headcount} />
@@ -52,7 +50,7 @@ export default async function InvitationPage({ params }: PageProps<"/[lang]">) {
         <Schedule copy={dict.schedule} />
         <RsvpSection copy={dict.rsvp} confirmation={dict.confirmation} lang={lang} />
       </main>
-      <SiteFooter copy={dict.footer} names={dict.hero.names} />
+      <SiteFooter copy={dict.footer} names={dict.hero.names} lang={lang} switchLanguage={dict.nav.switchLanguage} />
     </>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 type FallingPatternProps = React.ComponentProps<'div'> & {
@@ -9,156 +9,100 @@ type FallingPatternProps = React.ComponentProps<'div'> & {
 	color?: string;
 	/** Background color (default: 'var(--background)') */
 	backgroundColor?: string;
-	/** Animation duration in seconds (default: 150) */
+	/** Speed reference in seconds; 120 matches the original 21st.dev pacing (default: 150) */
 	duration?: number;
-	/** Blur intensity for the overlay effect (default: '1em') */
-	blurIntensity?: string;
 	/** Pattern density - affects spacing (default: 1) */
 	density?: number;
 };
+
+// The 21st.dev original animated 36 background-position values from JS every
+// frame under a full-size backdrop blur, which held the RSVP section near 9fps
+// on a phone. Here the same streak columns sit on three tiles that only
+// translate, so the browser moves them on the compositor with no repaints.
+const TILE_W = 300;
+const TILE_H = 400;
+
+// Columns 25px apart; y is where each streak and its dot sit in the tile, and
+// layer picks the speed the column fell at in the original (slow, mid, fast).
+const COLUMNS = [
+	{ y: 160, dot: 330, layer: 0 },
+	{ y: 230, dot: 60, layer: 2 },
+	{ y: 120, dot: 270, layer: 0 },
+	{ y: 280, dot: 40, layer: 2 },
+	{ y: 190, dot: 350, layer: 0 },
+	{ y: 110, dot: 250, layer: 1 },
+	{ y: 250, dot: 20, layer: 1 },
+	{ y: 140, dot: 300, layer: 2 },
+	{ y: 210, dot: 380, layer: 2 },
+	{ y: 130, dot: 290, layer: 2 },
+	{ y: 260, dot: 90, layer: 0 },
+	{ y: 170, dot: 340, layer: 0 },
+];
+
+// Fall speeds in px/s at duration 120 (averages of the original columns)
+const LAYER_SPEEDS = [47, 75, 128];
+
+function layerImage(layer: number, color: string) {
+	return COLUMNS.flatMap((c, i) => {
+		if (c.layer !== layer) return [];
+		const x = 2 + i * 25;
+		return [
+			`radial-gradient(4px 100px at ${x}px ${c.y}px, ${color}, transparent)`,
+			`radial-gradient(1.5px 1.5px at ${(x + 150) % TILE_W}px ${c.dot}px, ${color} 100%, transparent 150%)`,
+		];
+	}).join(', ');
+}
 
 export function FallingPattern({
 	color = 'var(--primary)',
 	backgroundColor = 'var(--background)',
 	duration = 150,
-	blurIntensity = '1em',
 	density = 1,
 	className,
 }: FallingPatternProps) {
-	// Generate background image style with customizable color
-	const generateBackgroundImage = () => {
-		const patterns = [
-			// Row 1
-			`radial-gradient(4px 100px at 0px 235px, ${color}, transparent)`,
-			`radial-gradient(4px 100px at 300px 235px, ${color}, transparent)`,
-			`radial-gradient(1.5px 1.5px at 150px 117.5px, ${color} 100%, transparent 150%)`,
-			// Row 2
-			`radial-gradient(4px 100px at 0px 252px, ${color}, transparent)`,
-			`radial-gradient(4px 100px at 300px 252px, ${color}, transparent)`,
-			`radial-gradient(1.5px 1.5px at 150px 126px, ${color} 100%, transparent 150%)`,
-			// Row 3
-			`radial-gradient(4px 100px at 0px 150px, ${color}, transparent)`,
-			`radial-gradient(4px 100px at 300px 150px, ${color}, transparent)`,
-			`radial-gradient(1.5px 1.5px at 150px 75px, ${color} 100%, transparent 150%)`,
-			// Row 4
-			`radial-gradient(4px 100px at 0px 253px, ${color}, transparent)`,
-			`radial-gradient(4px 100px at 300px 253px, ${color}, transparent)`,
-			`radial-gradient(1.5px 1.5px at 150px 126.5px, ${color} 100%, transparent 150%)`,
-			// Row 5
-			`radial-gradient(4px 100px at 0px 204px, ${color}, transparent)`,
-			`radial-gradient(4px 100px at 300px 204px, ${color}, transparent)`,
-			`radial-gradient(1.5px 1.5px at 150px 102px, ${color} 100%, transparent 150%)`,
-			// Row 6
-			`radial-gradient(4px 100px at 0px 134px, ${color}, transparent)`,
-			`radial-gradient(4px 100px at 300px 134px, ${color}, transparent)`,
-			`radial-gradient(1.5px 1.5px at 150px 67px, ${color} 100%, transparent 150%)`,
-			// Row 7
-			`radial-gradient(4px 100px at 0px 179px, ${color}, transparent)`,
-			`radial-gradient(4px 100px at 300px 179px, ${color}, transparent)`,
-			`radial-gradient(1.5px 1.5px at 150px 89.5px, ${color} 100%, transparent 150%)`,
-			// Row 8
-			`radial-gradient(4px 100px at 0px 299px, ${color}, transparent)`,
-			`radial-gradient(4px 100px at 300px 299px, ${color}, transparent)`,
-			`radial-gradient(1.5px 1.5px at 150px 149.5px, ${color} 100%, transparent 150%)`,
-			// Row 9
-			`radial-gradient(4px 100px at 0px 215px, ${color}, transparent)`,
-			`radial-gradient(4px 100px at 300px 215px, ${color}, transparent)`,
-			`radial-gradient(1.5px 1.5px at 150px 107.5px, ${color} 100%, transparent 150%)`,
-			// Row 10
-			`radial-gradient(4px 100px at 0px 281px, ${color}, transparent)`,
-			`radial-gradient(4px 100px at 300px 281px, ${color}, transparent)`,
-			`radial-gradient(1.5px 1.5px at 150px 140.5px, ${color} 100%, transparent 150%)`,
-			// Row 11
-			`radial-gradient(4px 100px at 0px 158px, ${color}, transparent)`,
-			`radial-gradient(4px 100px at 300px 158px, ${color}, transparent)`,
-			`radial-gradient(1.5px 1.5px at 150px 79px, ${color} 100%, transparent 150%)`,
-			// Row 12
-			`radial-gradient(4px 100px at 0px 210px, ${color}, transparent)`,
-			`radial-gradient(4px 100px at 300px 210px, ${color}, transparent)`,
-			`radial-gradient(1.5px 1.5px at 150px 105px, ${color} 100%, transparent 150%)`,
-		];
+	const rootRef = useRef<HTMLDivElement>(null);
 
-		return patterns.join(', ');
-	};
+	// Off screen, stop the layers so the compositor can idle
+	useEffect(() => {
+		const root = rootRef.current;
+		if (!root) return;
+		const io = new IntersectionObserver(([entry]) => {
+			root.dataset.paused = entry.isIntersecting ? 'false' : 'true';
+		});
+		io.observe(root);
+		return () => io.disconnect();
+	}, []);
 
-	const backgroundSizes = [
-		'300px 235px',
-		'300px 235px',
-		'300px 235px',
-		'300px 252px',
-		'300px 252px',
-		'300px 252px',
-		'300px 150px',
-		'300px 150px',
-		'300px 150px',
-		'300px 253px',
-		'300px 253px',
-		'300px 253px',
-		'300px 204px',
-		'300px 204px',
-		'300px 204px',
-		'300px 134px',
-		'300px 134px',
-		'300px 134px',
-		'300px 179px',
-		'300px 179px',
-		'300px 179px',
-		'300px 299px',
-		'300px 299px',
-		'300px 299px',
-		'300px 215px',
-		'300px 215px',
-		'300px 215px',
-		'300px 281px',
-		'300px 281px',
-		'300px 281px',
-		'300px 158px',
-		'300px 158px',
-		'300px 158px',
-		'300px 210px',
-		'300px 210px',
-	].join(', ');
+	const scale = 120 / duration;
 
-	const startPositions =
-		'0px 220px, 3px 220px, 151.5px 337.5px, 25px 24px, 28px 24px, 176.5px 150px, 50px 16px, 53px 16px, 201.5px 91px, 75px 224px, 78px 224px, 226.5px 230.5px, 100px 19px, 103px 19px, 251.5px 121px, 125px 120px, 128px 120px, 276.5px 187px, 150px 31px, 153px 31px, 301.5px 120.5px, 175px 235px, 178px 235px, 326.5px 384.5px, 200px 121px, 203px 121px, 351.5px 228.5px, 225px 224px, 228px 224px, 376.5px 364.5px, 250px 26px, 253px 26px, 401.5px 105px, 275px 75px, 278px 75px, 426.5px 180px';
-	const endPositions =
-		'0px 6800px, 3px 6800px, 151.5px 6917.5px, 25px 13632px, 28px 13632px, 176.5px 13758px, 50px 5416px, 53px 5416px, 201.5px 5491px, 75px 17175px, 78px 17175px, 226.5px 17301.5px, 100px 5119px, 103px 5119px, 251.5px 5221px, 125px 8428px, 128px 8428px, 276.5px 8495px, 150px 9876px, 153px 9876px, 301.5px 9965.5px, 175px 13391px, 178px 13391px, 326.5px 13540.5px, 200px 14741px, 203px 14741px, 351.5px 14848.5px, 225px 18770px, 228px 18770px, 376.5px 18910.5px, 250px 5082px, 253px 5082px, 401.5px 5161px, 275px 6375px, 278px 6375px, 426.5px 6480px';
 	return (
-		<div className={cn('relative h-full w-full p-1', className)}>
-			<motion.div
-				initial={{ opacity: 0 }}
-				animate={{ opacity: 1 }}
-				transition={{ duration: 0.2 }}
-				className="size-full"
-			>
-				<motion.div
-					className="relative size-full z-0"
-					style={{
-						backgroundColor,
-						backgroundImage: generateBackgroundImage(),
-						backgroundSize: backgroundSizes,
-					}}
-					variants={{
-						initial: {
-							backgroundPosition: startPositions,
-						},
-						animate: {
-							backgroundPosition: [startPositions, endPositions],
-							transition: {
-								duration: duration,
-								ease: 'linear',
-								repeat: Number.POSITIVE_INFINITY,
-							},
-						},
-					}}
-					initial="initial"
-					animate="animate"
+		<div
+			ref={rootRef}
+			data-paused="true"
+			className={cn('group/fall relative h-full w-full overflow-hidden', className)}
+			style={{ backgroundColor }}
+		>
+			{LAYER_SPEEDS.map((speed, layer) => (
+				<div
+					key={layer}
+					aria-hidden="true"
+					className="absolute inset-x-0 bottom-0 animate-falling-pattern will-change-transform group-data-[paused=true]/fall:[animation-play-state:paused] motion-reduce:animate-none"
+					style={
+						{
+							top: -TILE_H,
+							backgroundImage: layerImage(layer, color),
+							backgroundSize: `${TILE_W}px ${TILE_H}px`,
+							'--fall-distance': `${TILE_H}px`,
+							animationDuration: `${TILE_H / (speed * scale)}s`,
+						} as React.CSSProperties
+					}
 				/>
-			</motion.div>
+			))}
+			{/* Static dot screen over the streaks: the original's LED look, minus its backdrop blur */}
 			<div
-				className="absolute inset-0 z-1 dark:brightness-600"
+				aria-hidden="true"
+				className="absolute inset-0"
 				style={{
-					backdropFilter: `blur(${blurIntensity})`,
 					backgroundImage: `radial-gradient(circle at 50% 50%, transparent 0, transparent 2px, ${backgroundColor} 2px)`,
 					backgroundSize: `${8 * density}px ${8 * density}px`,
 				}}

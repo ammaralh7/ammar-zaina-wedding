@@ -18,26 +18,36 @@ export default function Component({ milestones }: TimelineProps) {
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
-    const handleScroll = () => {
+    let frame = 0;
+    const measure = () => {
+      frame = 0;
       if (!containerRef.current) return;
-      
+
       const rect = containerRef.current.getBoundingClientRect();
       const windowHeight = window.innerHeight;
-      
+
       // Calculate progress based on the middle of the screen
       const triggerPoint = windowHeight / 2;
       const totalHeight = rect.height;
       const scrolledPast = triggerPoint - rect.top;
-      
+
       let progress = scrolledPast / totalHeight;
       progress = Math.max(0, Math.min(1, progress));
-      setScrollProgress(progress);
+      // Re-render only when the line visibly moves
+      setScrollProgress((prev) => (Math.abs(prev - progress) < 0.002 ? prev : progress));
+    };
+    // At most one measurement per frame, however many scroll events arrive
+    const handleScroll = () => {
+      if (!frame) frame = requestAnimationFrame(measure);
     };
 
-    window.addEventListener("scroll", handleScroll);
-    handleScroll(); // Initial calculation
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    measure(); // Initial calculation
 
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(frame);
+    };
   }, []);
 
   return (
@@ -46,10 +56,11 @@ export default function Component({ milestones }: TimelineProps) {
         {/* Background line (faded) */}
         <div className="absolute start-4 md:start-1/2 top-0 bottom-0 w-[2px] bg-gold-soft/50 -translate-x-1/2 rtl:translate-x-1/2" />
 
-        {/* Animated foreground line (draws on scroll) */}
+        {/* Animated foreground line (draws on scroll). Scaled rather than
+            resized, so drawing it never triggers a layout pass. */}
         <div
-          className="absolute start-4 md:start-1/2 top-0 w-[2px] bg-gradient-to-b from-primary to-gold-deep shadow-[0_0_12px_var(--primary)] -translate-x-1/2 rtl:translate-x-1/2 transition-all duration-100 ease-out z-0"
-          style={{ height: `${scrollProgress * 100}%` }}
+          className="absolute start-4 md:start-1/2 top-0 bottom-0 w-[2px] origin-top bg-gradient-to-b from-primary to-gold-deep shadow-[0_0_12px_var(--primary)] -translate-x-1/2 rtl:translate-x-1/2 transition-transform duration-100 ease-out z-0"
+          style={{ scale: `1 ${scrollProgress}` }}
         />
 
         <div className="flex flex-col gap-16 md:gap-24 relative z-10">

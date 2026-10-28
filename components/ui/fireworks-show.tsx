@@ -199,19 +199,39 @@ export const FireworksBackground = ({
     const observer = new ResizeObserver(updateCanvasSize);
     if (canvas.parentElement) observer.observe(canvas.parentElement);
 
-    
+
     for (let i = 0; i < 3; i++) {
       createFirework();
     }
     lastFireworkTimeRef.current = Date.now();
 
-    animationFrameRef.current = requestAnimationFrame(updateAndDraw);
+    // Only draw while the show is on screen and the tab is visible
+    let onScreen = false;
+    const sync = () => {
+      const run = onScreen && document.visibilityState === "visible";
+      if (run && !animationFrameRef.current) {
+        lastFireworkTimeRef.current = Date.now();
+        animationFrameRef.current = requestAnimationFrame(updateAndDraw);
+      } else if (!run && animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = 0;
+      }
+    };
+    const visibility = new IntersectionObserver(([entry]) => {
+      onScreen = entry.isIntersecting;
+      sync();
+    });
+    visibility.observe(canvas);
+    document.addEventListener("visibilitychange", sync);
 
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = 0;
       }
       observer.disconnect();
+      visibility.disconnect();
+      document.removeEventListener("visibilitychange", sync);
     };
   }, []);
 

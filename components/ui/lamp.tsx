@@ -32,12 +32,15 @@ export const LampContainer = ({
   return (
     <div
       className={cn(
-        "relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-night w-full rounded-md z-0",
+        "relative flex flex-col items-center overflow-hidden bg-night w-full rounded-md z-0",
         className
       )}
     >
-      {/* The beams are drawn with physical angles, so keep them LTR on RTL pages */}
-      <div dir="ltr" className="relative flex w-full flex-1 scale-y-125 items-center justify-center isolate z-0 ">
+      {/* The lamp is pinned to the top and the content flows below its light line
+          (5.25rem down), so a long verse grows the section instead of being pulled
+          up under the top edge. The beams are drawn with physical angles, so keep
+          them LTR on RTL pages. */}
+      <div dir="ltr" className="pointer-events-none absolute inset-x-0 top-0 flex h-[28rem] scale-y-125 items-center justify-center isolate z-0 ">
         <motion.div
           initial={{ opacity: 0.5, width: "15rem" }}
           whileInView={{ opacity: 1, width: "30rem" }}
@@ -97,7 +100,7 @@ export const LampContainer = ({
         <div className="absolute inset-auto z-40 h-44 w-full -translate-y-[12.5rem] bg-night "></div>
       </div>
 
-      <div className="relative z-50 flex -translate-y-80 flex-col items-center px-5">
+      <div className="relative z-50 flex flex-col items-center px-5 pt-28 pb-24 md:pt-32">
         {children}
       </div>
     </div>
