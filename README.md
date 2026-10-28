@@ -1,15 +1,15 @@
 # Ammar & Zaina · Wedding RSVP
 
-Invitation and RSVP site for **Tuesday, July 27, 2027 · Cairo, Egypt**, in English (`/en`) and Arabic (`/ar`).
+One-page RSVP for **Tuesday, July 27, 2027 · Cairo, Egypt**, in Arabic (`/ar`, the default) and English (`/en`).
 
-- Guests reply coming / not coming, with party size, phone and a note. Replies are saved to Supabase, and each guest sees a confirmation they can edit later from the same device.
-- `/en/admin` (password protected) shows the live headcount, every reply, a search box, a status filter, delete, and CSV export.
-- The UI is built from real [21st.dev](https://21st.dev) registry components in `components/ui` (cloth-peel reveal, sparkles, text shimmer and reveal, animated countdown, fireworks, falling pattern, scroll word reveal, scroll timeline, guest selector, confetti, count-up, datatable). The theme is 21st's "Honey Glow Gold".
+- Guests enter their name, phone number and number of guests. Replies are saved to Supabase, and each guest sees a confirmation they can edit later from the same device.
+- `/ar/admin` (password protected) shows the live headcount, every reply, a search box, a status filter, delete, and CSV export.
+- The theme is 21st.dev's "Honey Glow Gold"; the admin table and count-up come from the [21st.dev](https://21st.dev) registry.
 
 ## Edit the details
 
-- `lib/wedding-config.ts`: date and time, map link, max party size, and whether the public headcount is shown.
-- `lib/dictionaries.ts`: all wording in English and Arabic, including the venue and the evening schedule.
+- `lib/wedding-config.ts`: the phone field's default country, the most guests per reply, and which language the main link opens.
+- `lib/dictionaries.ts`: all wording in Arabic and English.
 
 ## Setup
 

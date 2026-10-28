@@ -75,7 +75,7 @@ export default async function AdminPage({ params }: PageProps<"/[lang]/admin">) 
       <div className="mx-auto flex max-w-6xl flex-col gap-10">
         <header className="text-center">
           <Link href={`/${lang}`} className="font-script text-4xl text-gold-deep">
-            {dict.nav.monogram}
+            {dict.page.monogram}
           </Link>
           <h1 className="mt-4 font-serif text-4xl md:text-5xl">{dict.admin.title}</h1>
           <p className="mt-2 text-muted-foreground">{dict.admin.subtitle}</p>

@@ -8,16 +8,14 @@ import { emailRsvpNotice } from "@/lib/notify";
 import { getSupabase } from "@/lib/supabase-server";
 import { wedding } from "@/lib/wedding-config";
 
-export type RsvpErrorKey = "name" | "attending" | "party" | "phone" | "notConfigured" | "generic";
+export type RsvpErrorKey = "name" | "party" | "phone" | "notConfigured" | "generic";
 
 export type SavedRsvp = {
   id: string;
   token: string;
   name: string;
-  attending: boolean;
   partySize: number;
   phone: string;
-  message: string;
 };
 
 export type RsvpState =
@@ -25,25 +23,20 @@ export type RsvpState =
   | { status: "error"; error: RsvpErrorKey }
   | { status: "saved"; rsvp: SavedRsvp };
 
-const rsvpSchema = z
-  .object({
-    name: z.string().trim().min(2, "name").max(100, "name"),
-    attending: z.enum(["yes", "no"], { error: "attending" }),
-    partySize: z.coerce.number().int().min(0).max(wedding.maxPartySize),
-    // Any country: the form sends E.164 (+<country code><number>)
-    phone: z
-      .string()
-      .trim()
-      .max(40)
-      .optional()
-      .default("")
-      .refine((v) => v === "" || isPossiblePhoneNumber(v), "phone"),
-    message: z.string().trim().max(500).optional().default(""),
-    locale: z.enum(["en", "ar"]).catch("en"),
-    id: z.uuid().optional().or(z.literal("")),
-    token: z.uuid().optional().or(z.literal("")),
-  })
-  .refine((v) => v.attending === "no" || v.partySize >= 1, { message: "party" });
+// The page only collects who is coming: a name, a phone number and how many guests.
+const rsvpSchema = z.object({
+  name: z.string().trim().min(2, "name").max(100, "name"),
+  // Any country: the form sends E.164 (+<country code><number>)
+  phone: z
+    .string()
+    .trim()
+    .max(40, "phone")
+    .refine((v) => isPossiblePhoneNumber(v), "phone"),
+  partySize: z.coerce.number("party").int("party").min(1, "party").max(wedding.maxPartySize, "party"),
+  locale: z.enum(["en", "ar"]).catch("en"),
+  id: z.uuid().optional().or(z.literal("")),
+  token: z.uuid().optional().or(z.literal("")),
+});
 
 function str(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -56,10 +49,8 @@ export async function submitRsvp(_prev: RsvpState, formData: FormData): Promise<
 
   const parsed = rsvpSchema.safeParse({
     name: str(formData, "name"),
-    attending: str(formData, "attending"),
-    partySize: str(formData, "partySize") ?? "0",
-    phone: str(formData, "phone"),
-    message: str(formData, "message"),
+    phone: str(formData, "phone") ?? "",
+    partySize: str(formData, "partySize") ?? "1",
     locale: str(formData, "locale"),
     id: str(formData, "id"),
     token: str(formData, "token"),
@@ -68,9 +59,7 @@ export async function submitRsvp(_prev: RsvpState, formData: FormData): Promise<
   if (!parsed.success) {
     const message = parsed.error.issues[0]?.message;
     const error: RsvpErrorKey =
-      message === "name" || message === "attending" || message === "party" || message === "phone"
-        ? message
-        : "generic";
+      message === "name" || message === "party" || message === "phone" ? message : "generic";
     return { status: "error", error };
   }
 
@@ -78,13 +67,12 @@ export async function submitRsvp(_prev: RsvpState, formData: FormData): Promise<
   if (!supabase) return { status: "error", error: "notConfigured" };
 
   const v = parsed.data;
-  const attending = v.attending === "yes";
   const row = {
     name: v.name,
-    attending,
-    party_size: attending ? v.partySize : 0,
-    phone: v.phone || null,
-    message: v.message || null,
+    attending: true,
+    party_size: v.partySize,
+    phone: v.phone,
+    message: null,
     locale: v.locale,
   };
 
@@ -124,10 +112,8 @@ export async function submitRsvp(_prev: RsvpState, formData: FormData): Promise<
       id: result.id,
       token: result.edit_token,
       name: row.name,
-      attending,
       partySize: row.party_size,
       phone: v.phone,
-      message: v.message,
     },
   };
 }
@@ -140,7 +126,7 @@ export async function getMyRsvp(id: string, token: string): Promise<SavedRsvp | 
 
   const { data } = await supabase
     .from("rsvps")
-    .select("id, edit_token, name, attending, party_size, phone, message")
+    .select("id, edit_token, name, party_size, phone")
     .eq("id", ids.data.id)
     .eq("edit_token", ids.data.token)
     .maybeSingle();
@@ -150,9 +136,7 @@ export async function getMyRsvp(id: string, token: string): Promise<SavedRsvp | 
     id: data.id,
     token: data.edit_token,
     name: data.name,
-    attending: data.attending,
     partySize: data.party_size,
     phone: data.phone ?? "",
-    message: data.message ?? "",
   };
 }

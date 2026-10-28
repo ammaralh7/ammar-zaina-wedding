@@ -45,15 +45,6 @@ export function computeStats(rows: RsvpRow[]): RsvpStats {
   return { guests, accepted, declined: rows.length - accepted, replies: rows.length };
 }
 
-// Public number only: total people coming.
-export async function getAttendingGuestCount(): Promise<number | null> {
-  const supabase = getSupabase();
-  if (!supabase) return null;
-  const { data, error } = await supabase.from("rsvps").select("party_size").eq("attending", true);
-  if (error) return null;
-  return data.reduce((sum, row) => sum + row.party_size, 0);
-}
-
 // Any query counts as activity, which keeps a free Supabase project from
 // being paused after a quiet week. Reads no rows, only a count.
 export async function pingDatabase(): Promise<boolean> {
